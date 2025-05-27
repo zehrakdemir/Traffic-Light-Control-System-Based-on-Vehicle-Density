@@ -57,15 +57,30 @@ public class TrafficView {
         // Input panel
         VBox inputPanel = new VBox(10);
         inputPanel.setPadding(new Insets(10));
-        String[] directions = {"North", "South", "East", "West"};
-        for (int i = 0; i < 4; i++) {
+        String[] directions = {"South", "North", "West", "East"};
+        /*for (int i = 0; i < 4; i++) {
             HBox row = new HBox(10);
             densityFields[i] = new TextField("0");
             timerLabels[i] = new Label("0s");
             row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityFields[i],
                     new Label("Timer:"), timerLabels[i]);
             inputPanel.getChildren().add(row);
+        }*/
+        for (int i = 0; i < 4; i++) {
+            HBox row = new HBox(10);
+            final TextField densityField = new TextField("0");
+            densityFields[i] = densityField;
+            timerLabels[i] = new Label("0.0s");
+            row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
+                    new Label("Timer:"), timerLabels[i]);
+            inputPanel.getChildren().add(row);
+            densityField.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal.matches("\\d*")) {
+                    densityField.setText(newVal.replaceAll("[^\\d]", ""));
+                }
+            });
         }
+
 
         // Control buttons (converted to local variables as suggested)
         HBox controls = new HBox(10);
@@ -186,11 +201,11 @@ public class TrafficView {
 
         // Draw traffic lights (outside roads)
         int phase = controller.getModel().getCurrentPhase();
-        drawTrafficLight(220, 160, phase == 0 ? "green" : phase == 1 ? "yellow" : "red"); // North
-        drawTrafficLight(350, 350, phase == 0 ? "green" : phase == 1 ? "yellow" : "red"); // South
+        drawTrafficLight(350, 350, phase == 2  ? "green" : (phase == 1)||(phase==3) ? "yellow" : "red"); // North
+        drawTrafficLight(220, 160, phase == 6 ? "green" : (phase == 5)||(phase==7) ? "yellow" : "red"); // South
 
-        drawTrafficLightHorizontal(160, 350, phase == 2 ? "green" : phase == 3 ? "yellow" : "red"); // East
-        drawTrafficLightHorizontal(350, 220, phase == 2 ? "green" : phase == 3 ? "yellow" : "red"); // West
+        drawTrafficLightHorizontal(350, 220, phase == 0 ? "green" : (phase == 1)||(phase==7)  ? "yellow" : "red"); // west
+        drawTrafficLightHorizontal(160, 350, phase == 4 ? "green" : (phase == 3)||(phase==5)  ? "yellow" : "red"); // east
 
 
         // Draw vehicles
@@ -245,10 +260,10 @@ public class TrafficView {
 
         // Update timers
         double remaining = controller.getModel().getRemainingTime();
-        timerLabels[0].setText(phase == 0 || phase == 1 ? String.format("%.1fs", remaining) : "0.0s"); // North
-        timerLabels[1].setText(phase == 0 || phase == 1 ? String.format("%.1fs", remaining) : "0.0s"); // South
-        timerLabels[2].setText(phase == 2 || phase == 3 ? String.format("%.1fs", remaining) : "0.0s"); // East
-        timerLabels[3].setText(phase == 2 || phase == 3 ? String.format("%.1fs", remaining) : "0.0s"); // West
+        timerLabels[0].setText(phase == 2 ? String.format("%.1fs", remaining) : "0.0s"); // North
+        timerLabels[1].setText(phase == 6 ? String.format("%.1fs", remaining) : "0.0s"); // South
+        timerLabels[2].setText(phase == 4 ? String.format("%.1fs", remaining) : "0.0s"); // East
+        timerLabels[3].setText(phase == 0 ? String.format("%.1fs", remaining) : "0.0s"); // West
     }
 
     private void drawTrafficLight(double x, double y, String activeLight) {

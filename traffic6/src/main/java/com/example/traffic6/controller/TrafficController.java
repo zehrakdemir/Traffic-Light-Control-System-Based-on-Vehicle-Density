@@ -40,6 +40,7 @@ public class TrafficController {
         view.render();
     }
 
+
     public void generateRandomCounts() {
         model.generateRandomCounts();
         view.updateVehicleCounts(model.getVehicleCounts());

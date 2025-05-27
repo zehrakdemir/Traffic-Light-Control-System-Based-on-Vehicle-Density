@@ -1,7 +1,7 @@
 package com.example.traffic6.model;
 
 public class Vehicle {
-    private int direction; // 0: North, 1: South, 2: East, 3: West
+    private int direction; // direction 0: North, 1: South, 2: East, 3: West
     private double position; // aracın kavşağa uzaklığı(negatifse yaklaşıyor)
     private String type; // car, truck, ambulance
     private String turn; // Aracın dönüş yönü (right, left ya da straight)
