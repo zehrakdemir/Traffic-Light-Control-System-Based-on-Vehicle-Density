@@ -24,7 +24,7 @@ public class TrafficController {
             model.setVehicleCounts(north, south, east, west);
             model.startSimulation();
         } catch (NumberFormatException e) {
-            // Handle invalid input
+            // Geçersiz girdi
             model.generateRandomCounts();
             view.updateVehicleCounts(model.getVehicleCounts());
         }
@@ -48,6 +48,7 @@ public class TrafficController {
     public void update(double deltaTime) {
         model.update(deltaTime);
     }
+
 
     public TrafficModel getModel() {
         return model;

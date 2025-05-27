@@ -1,17 +1,18 @@
 package com.example.traffic6.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
 public class TrafficModel {
-    private static final int TOTAL_CYCLE_TIME = 120; // seconds for green lights
+    private static final int TOTAL_CYCLE_TIME = 120; // toplam yeşil ışık süresi
     private static final int YELLOW_DURATION = 3; // seconds
     private static final int MIN_GREEN = 10; // seconds
     private static final int MAX_GREEN = 60; // seconds
     private int[] vehicleCounts = new int[4]; // North, South, East, West
     private int[] greenDurations = new int[4];
-    private List<Vehicle>[] vehicles = new ArrayList[4]; // Vehicles per direction
+    private List<Vehicle>[] vehicles = new ArrayList[4]; // Yöne göre araçlar
     private int currentPhase = 0; // 0: NS Green, 1: NS Yellow, 2: EW Green, 3: EW Yellow
     private double remainingTime = 0;
     private boolean isRunning = false;
@@ -22,6 +23,7 @@ public class TrafficModel {
         }
     }
 
+    //yönlerdeki araç sayıları
     public void setVehicleCounts(int north, int south, int east, int west) {
         vehicleCounts[0] = Math.max(0, north);
         vehicleCounts[1] = Math.max(0, south);
@@ -55,7 +57,7 @@ public class TrafficModel {
             percentages[i] = (double) vehicleCounts[i] / totalVehicles;
         }
 
-        // Allocate green times for NS and EW pairs, total 120 seconds
+        // Allocate green times for NS and EW pairs, toplam 120 saniye
         double nsPercentage = percentages[0] + percentages[1];
         double ewPercentage = percentages[2] + percentages[3];
         int nsGreenTotal = Math.max(MIN_GREEN * 2, Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * nsPercentage)));
@@ -66,7 +68,7 @@ public class TrafficModel {
         greenDurations[2] = (int) (ewGreenTotal * (percentages[2] / (percentages[2] + percentages[3] + 0.0001)));
         greenDurations[3] = ewGreenTotal - greenDurations[2];
 
-        // Ensure minimum green time
+        // minimum yeşil yanma süresine uygunluk
         for (int i = 0; i < 4; i++) {
             greenDurations[i] = Math.max(MIN_GREEN, greenDurations[i]);
         }
@@ -77,7 +79,8 @@ public class TrafficModel {
         for (int i = 0; i < 4; i++) {
             vehicles[i].clear();
             for (int j = 0; j < vehicleCounts[i]; j++) {
-                // Randomly assign vehicle type and turn direction
+
+                // Araç tipini ve dönüş yönünü rastgele atama
                 String type = rand.nextInt(3) == 0 ? "car" : rand.nextInt(2) == 0 ? "truck" : "ambulance";
                 String turn = rand.nextInt(3) == 0 ? "left" : rand.nextInt(2) == 0 ? "right" : "straight";
                 vehicles[i].add(new Vehicle(i, j * 60, type, turn)); // Increased spacing to 60 pixels
@@ -93,7 +96,7 @@ public class TrafficModel {
             advancePhase();
         }
 
-        // Move vehicles during green phases, prioritize NS over EW if conflict
+        // Yeşil ışıkta araçları hareket ettir, çatışma durumunda EW yerine NS'ye öncelik ver
         if (currentPhase == 0) {
             moveVehiclesWithPriority(0, deltaTime); // North
             moveVehiclesWithPriority(1, deltaTime); // South
@@ -119,30 +122,39 @@ public class TrafficModel {
     private void moveVehiclesWithPriority(int direction, double deltaTime) {
         List<Vehicle> toRemove = new ArrayList<>();
         Vehicle prevVehicle = null;
+        vehicles[direction].sort(Comparator.comparingDouble(Vehicle::getPosition).reversed());
+
         for (Vehicle vehicle : vehicles[direction]) {
             // Check if vehicle should stop (red or yellow and not past intersection)
-            int phase = getCurrentPhase();
+            int phase = getCurrentPhase(); //Trafik ışıklarının hangi fazda olduğunu belirtir (0–3 arası).
             boolean isGreen = (direction <= 1 && phase == 0) || (direction >= 2 && phase == 2);
             boolean isYellow = (direction <= 1 && phase == 1) || (direction >= 2 && phase == 3);
             if (!isGreen && (isYellow && vehicle.getPosition() < -20)) {
                 continue; // Stop if yellow and not past intersection
             }
 
-            // Prevent collision with previous vehicle
+
+
+            // Önceki araçla çarpışmayı önle
             if (prevVehicle != null) {
-                double minDistance = prevVehicle.getType().equals("truck") ? 80 : 60; // Larger for trucks
-                if (vehicle.getPosition() + minDistance > prevVehicle.getPosition()) {
-                    continue; // Wait if too close
+                double dx = prevVehicle.getActualX() - vehicle.getActualX();
+                double dy = prevVehicle.getActualY() - vehicle.getActualY();
+                double distance = Math.sqrt(dx * dx + dy * dy);
+
+                double minDistance = prevVehicle.getType().equals("truck") ? 80 : 60;
+                if (distance < minDistance) {
+                    continue; // Çok yakın, ilerleme
                 }
             }
 
+
             vehicle.move(deltaTime);
             if (vehicle.hasPassedIntersection()) {
-                toRemove.add(vehicle);
+                // toRemove.add(vehicle);
             }
             prevVehicle = vehicle;
         }
-        vehicles[direction].removeAll(toRemove);
+        vehicles[direction].removeAll(toRemove); //Kavşağı geçen araçlar ana listeden çıkarılır.
     }
 
     public int[] getVehicleCounts() {
@@ -168,7 +180,7 @@ public class TrafficModel {
     public void startSimulation() {
         isRunning = true;
         currentPhase = 0;
-        remainingTime = greenDurations[0] + greenDurations[1];
+        remainingTime = greenDurations[currentPhase];
     }
 
     public void pauseSimulation() {
