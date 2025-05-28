@@ -5,7 +5,9 @@ public class Vehicle {
     private double position; // aracın kavşağa uzaklığı(negatifse yaklaşıyor)
     private String type; // car, truck, ambulance
     private String turn; // Aracın dönüş yönü (right, left ya da straight)
-    private static final double SPEED = 50; // Pixels per second
+    private static final double SPEED = 50;
+    private static final double SPEED2=500;
+    // Pixels per second
     private double turnAngle = 0; // Dönüş sırasında aracın döndüğü açı.
     private boolean isTurning = false; //Aracın şu anda dönüp dönmediğini belirten flag.
 
@@ -43,25 +45,17 @@ public class Vehicle {
     }
 
     public void move(double deltaTime) {
-        if (position < 0 || turn.equals("straight")) {
+        if (!hasPassedIntersection()) {
             position += SPEED * deltaTime;
+        }else if(hasPassedIntersection()){
+            position += SPEED2 * deltaTime;
         }
-        if (position >= -50 && !turn.equals("straight") && !isTurning) { //20 idi 50 yaptım
-            isTurning = true;
-            turnAngle = 0;
-        }
-        if (isTurning) {//DÖNÜŞLERRR
-            turnAngle += SPEED * deltaTime * 0.5; // Adjust turn speed
-            if (turnAngle >= 0) { //dönmesini istersem 90 derece yapıcamm
-                isTurning = false;
-                position += SPEED * deltaTime;
-            }
-        }
+
     }
 
 
     public boolean hasPassedIntersection() {
-        return position > 100; // Account for turning paths
+        return position > -20; // Account for turning paths
     }
 
     public int getDirection() {

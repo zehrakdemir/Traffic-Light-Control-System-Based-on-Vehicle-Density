@@ -14,24 +14,29 @@ public class TrafficController {
         view.setController(this);
     }
 
-    public void startSimulation() {
-        try {
-            TextField[] fields = view.getDensityFields();
-            int north = Integer.parseInt(fields[0].getText());
-            int south = Integer.parseInt(fields[1].getText());
-            int east = Integer.parseInt(fields[2].getText());
-            int west = Integer.parseInt(fields[3].getText());
-            model.setVehicleCounts(north, south, east, west);
-            model.startSimulation();
-        } catch (NumberFormatException e) {
-            // Geçersiz girdi
-            model.generateRandomCounts();
-            view.updateVehicleCounts(model.getVehicleCounts());
-        }
-    }
+
+   public void startSimulation() {
+       try {
+           TextField[] fields = view.getDensityFields();
+           int north = Integer.parseInt(fields[0].getText());
+           int south = Integer.parseInt(fields[1].getText());
+           int east = Integer.parseInt(fields[2].getText());
+           int west = Integer.parseInt(fields[3].getText());
+           model.setVehicleCounts(north, south, east, west);
+       } catch (NumberFormatException e) {
+           // Geçersiz giriş olursa rastgele sayılarla başlat
+           model.generateRandomCounts();
+           view.updateVehicleCounts(model.getVehicleCounts());
+       }
+       model.startSimulation();// Giriş geçerli olsun ya da olmasın simülasyonu başlat
+   }
 
     public void pauseSimulation() {
         model.pauseSimulation();
+    }
+
+    public void resumeSimulation() {
+        model.resumeSimulation();
     }
 
     public void resetSimulation() {
@@ -39,6 +44,7 @@ public class TrafficController {
         view.updateVehicleCounts(new int[]{0, 0, 0, 0});
         view.render();
     }
+
 
 
     public void generateRandomCounts() {

@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.List;
 
 public class TrafficView {
@@ -66,20 +67,66 @@ public class TrafficView {
                     new Label("Timer:"), timerLabels[i]);
             inputPanel.getChildren().add(row);
         }*/
+        timerLabels[3] = new Label("0.0s");
+        timerLabels[1] = new Label("0.0s");
+        timerLabels[2] = new Label("0.0s");
+        timerLabels[0] = new Label("0.0s");
         for (int i = 0; i < 4; i++) {
-            HBox row = new HBox(10);
-            final TextField densityField = new TextField("0");
-            densityFields[i] = densityField;
-            timerLabels[i] = new Label("0.0s");
-            row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
-                    new Label("Timer:"), timerLabels[i]);
-            inputPanel.getChildren().add(row);
-            densityField.textProperty().addListener((obs, oldVal, newVal) -> {
-                if (!newVal.matches("\\d*")) {
-                    densityField.setText(newVal.replaceAll("[^\\d]", ""));
-                }
-            });
+            if (i == 0) {
+                HBox row = new HBox(10);
+                final TextField densityField = new TextField("0");
+                densityFields[i] = densityField;
+
+                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
+                        new Label("Timer:"), timerLabels[3]);
+                inputPanel.getChildren().add(row);
+                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
+                    if (!newVal.matches("\\d*")) {
+                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
+                    }
+                });
+            }else if(i==1) {
+                HBox row = new HBox(10);
+                final TextField densityField = new TextField("0");
+                densityFields[i] = densityField;
+
+                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
+                        new Label("Timer:"), timerLabels[i]);
+                inputPanel.getChildren().add(row);
+                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
+                    if (!newVal.matches("\\d*")) {
+                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
+                    }
+                });
+            }else if(i==2) {
+                HBox row = new HBox(10);
+                final TextField densityField = new TextField("0");
+                densityFields[i] = densityField;
+
+                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
+                        new Label("Timer:"), timerLabels[i]);
+                inputPanel.getChildren().add(row);
+                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
+                    if (!newVal.matches("\\d*")) {
+                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
+                    }
+                });
+            }else if(i==3) {
+                HBox row = new HBox(10);
+                final TextField densityField = new TextField("0");
+                densityFields[3] = densityField;
+
+                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
+                        new Label("Timer:"), timerLabels[0]);
+                inputPanel.getChildren().add(row);
+                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
+                    if (!newVal.matches("\\d*")) {
+                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
+                    }
+                });
+            }
         }
+
 
 
         // Control buttons (converted to local variables as suggested)
@@ -88,7 +135,8 @@ public class TrafficView {
         Button pauseButton = new Button("Pause");
         Button resetButton = new Button("Reset");
         Button randomButton = new Button("Random");
-        controls.getChildren().addAll(startButton, pauseButton, resetButton, randomButton);
+        Button resumeButton = new Button("Resume");
+        controls.getChildren().addAll(startButton, pauseButton, resetButton, randomButton,resumeButton);
         controls.setAlignment(Pos.CENTER);
         inputPanel.getChildren().add(controls);
 
@@ -100,6 +148,7 @@ public class TrafficView {
         pauseButton.setOnAction(e -> controller.pauseSimulation());
         resetButton.setOnAction(e -> controller.resetSimulation());
         randomButton.setOnAction(e -> controller.generateRandomCounts());
+        resumeButton.setOnAction(e -> controller.resumeSimulation());
 
         // Start the animation timer
         timer.start();
@@ -183,6 +232,11 @@ public class TrafficView {
         drawHouse(gc, 460, 140);
 
 
+        // Bahçeye çiçekler ekle
+        drawFlower(gc, 30, 30, Color.PINK, Color.YELLOW);
+        drawFlower(gc, 50, 50, Color.LIGHTBLUE, Color.ORANGE);
+        drawFlower(gc, 35, 40, Color.PURPLE, Color.WHITE);
+
 
         // Draw trees
 
@@ -192,10 +246,10 @@ public class TrafficView {
         drawTree(gc, 430, 420);
 
         // Draw crosswalks (zebra crossings)
-        /*drawCrosswalk(250, 180, true);  // North
-        drawCrosswalk(250, 380, true);  // South
+        //drawCrosswalk(250, 180, true);  // North
+        //drawCrosswalk(250, 380, true);  // South
         drawCrosswalk(180, 250, false); // West
-        drawCrosswalk(380, 250, false); // East*/
+        //drawCrosswalk(380, 250, false); // East
 
 
 
@@ -260,10 +314,10 @@ public class TrafficView {
 
         // Update timers
         double remaining = controller.getModel().getRemainingTime();
-        timerLabels[0].setText(phase == 2 ? String.format("%.1fs", remaining) : "0.0s"); // North
+        timerLabels[3].setText(phase == 2 ? String.format("%.1fs", remaining) : "0.0s"); // North
         timerLabels[1].setText(phase == 6 ? String.format("%.1fs", remaining) : "0.0s"); // South
         timerLabels[2].setText(phase == 4 ? String.format("%.1fs", remaining) : "0.0s"); // East
-        timerLabels[3].setText(phase == 0 ? String.format("%.1fs", remaining) : "0.0s"); // West
+        timerLabels[0].setText(phase == 0 ? String.format("%.1fs", remaining) : "0.0s"); // West
     }
 
     private void drawTrafficLight(double x, double y, String activeLight) {
@@ -276,6 +330,7 @@ public class TrafficView {
         gc.setFill(activeLight.equals("green") ? Color.GREEN : Color.GRAY);
         gc.fillOval(x + 5, y + 65, 20, 20);
     }
+
     private void drawTrafficLightHorizontal(double x, double y, String activeLight) {
         gc.setFill(Color.BLACK);
         gc.fillRect(x, y, 90, 30); // Yatay siyah kutu (3 ışık için 30x30'luk kutular)
@@ -293,6 +348,24 @@ public class TrafficView {
         gc.fillOval(x + 65, y + 5, 20, 20);
     }
 
+    public static void drawFlower(GraphicsContext gc, double centerX, double centerY, Color petalColor, Color centerColor) {
+        double petalRadius = 10;
+        int petals = 3;
+
+        gc.setFill(petalColor);
+
+        // Yaprakları çiz
+        for (int i = 0; i < petals; i++) {
+            double angle = 2 * Math.PI / petals * i;
+            double x = centerX + Math.cos(angle) * petalRadius;
+            double y = centerY + Math.sin(angle) * petalRadius;
+            gc.fillOval(x - petalRadius, y - petalRadius, petalRadius * 2, petalRadius * 2);
+        }
+
+        // Orta kısmı çiz
+        gc.setFill(centerColor);
+        gc.fillOval(centerX - petalRadius / 2, centerY - petalRadius / 2, petalRadius, petalRadius);
+    }
 
     private void drawVehicle(double x, double y, String type) {
         if (type.equals("car")) {
@@ -323,9 +396,17 @@ public class TrafficView {
         return densityFields;
     }
 
+    /* public void updateVehicleCounts(int[] counts) {
+         for (int i = 0; i < 4; i++) {
+             densityFields[i].setText(String.valueOf(counts[i]));
+         }
+     }*/
     public void updateVehicleCounts(int[] counts) {
-        for (int i = 0; i < 4; i++) {
-            densityFields[i].setText(String.valueOf(counts[i]));
-        }
+        TextField[] fields = getDensityFields();
+        fields[0].setText(String.valueOf(counts[0]));
+        fields[1].setText(String.valueOf(counts[1]));
+        fields[2].setText(String.valueOf(counts[2]));
+        fields[3].setText(String.valueOf(counts[3]));
     }
+
 }

@@ -47,36 +47,39 @@ public class TrafficModel {
     private void calculateGreenDurations() {
         int totalVehicles = vehicleCounts[0] + vehicleCounts[1] + vehicleCounts[2] + vehicleCounts[3];
         if (totalVehicles == 0) {
-            for (int i = 0; i < 4; i++) {//hiç araç yoksa 0 saniye yeşil yansın
+            for (int i = 0; i < 4; i++) {//hiç araç yoksa 10 saniye yeşil yansın
                 greenDurations[i] = MIN_GREEN;
             }
             return;
         }
+
+
 
         double[] percentages = new double[4]; //o yoldaki araç sayısı/ toplam araç sayısı= yüzde
         for (int i = 0; i < 4; i++) {
             percentages[i] = (double) vehicleCounts[i] / totalVehicles;
         }
 
-        // Allocate green times for NS and EW pairs, toplam 120 saniye
-        double nPercentage = percentages[0] ;
+        //  toplam 120 saniye
+        double nPercentage = percentages[3] ;
         double sPercentage= percentages[1];
         double ePercentage = percentages[2];
-        double wPercentage = percentages[3];
-        int nGreenTotal = Math.max(MIN_GREEN * 2, Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * nPercentage)));
-        int sGreenTotal = Math.max(MIN_GREEN * 2, Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * sPercentage)));
-        int eGreenTotal = Math.max(MIN_GREEN * 2, Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * ePercentage)));
-        int wGreenTotal = Math.max(MIN_GREEN * 2, Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * wPercentage)));
+        double wPercentage = percentages[0];
+        int nGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * nPercentage)));
+        int sGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * sPercentage)));
+        int eGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * ePercentage)));
+        int wGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * wPercentage)));
 //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
-       // int[] greenDurations = new int[4];
-        greenDurations[0] = nGreenTotal;
+        // int[] greenDurations = new int[4];
+        greenDurations[3] = nGreenTotal;
         greenDurations[1] = sGreenTotal;
         greenDurations[2] = eGreenTotal;
-        greenDurations[3] = wGreenTotal;
+        greenDurations[0] = wGreenTotal;
 //0: north, 1: south, 2: east, 3: west
         // minimum yeşil yanma süresine uygunluk
         for (int i = 0; i < 4; i++) {
             greenDurations[i] = Math.max(MIN_GREEN, greenDurations[i]);
+            greenDurations[i] = Math.min(MAX_GREEN, greenDurations[i]);
         }
     }
 
@@ -86,14 +89,14 @@ public class TrafficModel {
             vehicles[i].clear();
             for (int j = 0; j < vehicleCounts[i]; j++) {
 
-                // Araç tipini ve dönüş yönünü rastgele atama
+                // Araç tipini rastgele atama
                 String type = rand.nextInt(3) == 0 ? "car" : rand.nextInt(2) == 0 ? "truck" : "ambulance";
                 String turn = "straight"; //rand.nextInt(3) == 0 ? "left" : rand.nextInt(2) == 0 ? "right" : sildim
                 vehicles[i].add(new Vehicle(i, j * 60, type, turn)); // Increased spacing to 60 pixels
             }
         }
     }
- //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
+    //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
     public void update(double deltaTime) {
         if (!isRunning) return;
 
@@ -102,7 +105,7 @@ public class TrafficModel {
             advancePhase();
         }
 
-        // Yeşil ışıkta araçları hareket ettir, çatışma durumunda EW yerine NS'ye öncelik ver
+        // Yeşil ışıkta araçları hareket ettir
         //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         if (currentPhase == 0) {
@@ -126,6 +129,10 @@ public class TrafficModel {
         greenDurations[1] = sGreenTotal;
         greenDurations[2] = eGreenTotal;
         greenDurations[3] = wGreenTotal;*/
+           /* greenDurations[3] = nGreenTotal;
+            greenDurations[1] = sGreenTotal;
+            greenDurations[2] = eGreenTotal;
+            greenDurations[0] = wGreenTotal;*/
             case 0: // West Green
                 remainingTime = greenDurations[3]; // Batı
                 break;
@@ -186,9 +193,8 @@ public class TrafficModel {
 
             vehicle.move(deltaTime);
             if (vehicle.hasPassedIntersection()) {
-                // toRemove.add(vehicle);
+                //toRemove.add(vehicle);
                 vehicle.move(deltaTime);
-
             }
             prevVehicle = vehicle;
         }
@@ -215,15 +221,36 @@ public class TrafficModel {
         return remainingTime;
     }
 
+    /* public void startSimulation() {
+         isRunning = true;
+         currentPhase = 0;
+         remainingTime = greenDurations[currentPhase];
+     }
+
+     public void pauseSimulation() {
+         isRunning = false;
+     }*/
+     /*public void startSimulation() {
+        isRunning = true;
+        currentPhase = 0;
+        advancePhase(); // İlk fazı başlat
+    }*/
+    public void resumeSimulation() {
+        if (!isRunning && remainingTime > 0) {
+            isRunning = true;
+        }
+    }
+
     public void startSimulation() {
+        calculateGreenDurations();
         isRunning = true;
         currentPhase = 0;
         remainingTime = greenDurations[currentPhase];
     }
-
     public void pauseSimulation() {
         isRunning = false;
     }
+
 
     public void resetSimulation() {
         isRunning = false;
