@@ -41,7 +41,6 @@ public class Vehicle {
         this.direction = direction;
         this.position = -initialPosition - 30;
         this.type = type;
-        //this.turn = turn;
     }
 
     public void move(double deltaTime) {

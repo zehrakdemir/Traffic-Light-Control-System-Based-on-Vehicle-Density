@@ -84,7 +84,7 @@ public class TrafficView {
         Button resetButton = new Button("Reset");
         Button randomButton = new Button("Random");
         Button resumeButton = new Button("Resume");
-        controls.getChildren().addAll(startButton, pauseButton, resetButton, randomButton,resumeButton);
+        controls.getChildren().addAll(startButton, pauseButton, resumeButton,resetButton, randomButton);
         controls.setAlignment(Pos.CENTER);
         inputPanel.getChildren().add(controls);
 
@@ -184,8 +184,8 @@ public class TrafficView {
 
     //Çiçek çizimi
     public static void drawFlower(GraphicsContext gc, double centerX, double centerY, Color petalColor, Color centerColor) {
-        double petalRadius = 10;
-        int petals = 3;
+        double petalRadius = 6;
+        int petals = 4;
 
         gc.setFill(petalColor);
 
@@ -202,23 +202,87 @@ public class TrafficView {
         gc.fillOval(centerX - petalRadius / 2, centerY - petalRadius / 2, petalRadius, petalRadius);
     }
 
+    // Ördek çizimi
+    private void drawDuck(GraphicsContext gc, double x, double y) {
+        // Gövde
+        gc.setFill(Color.ORANGE);
+        gc.fillOval(x, y, 25, 15);
+
+        // Kafa
+        gc.fillOval(x + 18, y - 8, 12, 12);
+
+        // Gaga
+        gc.setFill(Color.YELLOW);
+        gc.fillPolygon(new double[]{x + 28, x + 35, x + 28}, new double[]{y - 3, y + 2, y + 7}, 3);
+
+        // Göz
+        gc.setFill(Color.BLACK);
+        gc.fillOval(x + 24, y - 5, 2, 2);
+
+        // Ayaklar
+        gc.setFill(Color.ORANGE.darker());
+        gc.fillRect(x + 5, y + 15, 3, 5);
+        gc.fillRect(x + 15, y + 15, 3, 5);
+    }
+
+    // İnek çizimi
+    private void drawCow(GraphicsContext gc, double x, double y) {
+        // Gövde
+        gc.setFill(Color.WHITE);
+        gc.fillRect(x, y, 40, 25);
+
+        // Lekeler
+        gc.setFill(Color.BLACK);
+        gc.fillOval(x + 5, y + 5, 10, 8);
+        gc.fillOval(x + 25, y + 15, 8, 5);
+
+        // Kafa
+        gc.setFill(Color.WHITE);
+        gc.fillOval(x - 15, y - 5, 20, 15);
+
+        // Göz
+        gc.setFill(Color.BLACK);
+        gc.fillOval(x - 10, y - 2, 3, 3);
+
+        // Burun
+        gc.setFill(Color.PINK);
+        gc.fillOval(x - 13, y + 5, 6, 4);
+
+        // Kulaklar
+        gc.setFill(Color.WHITE);
+        gc.fillOval(x - 17, y - 8, 5, 5); // Sol kulak
+        gc.fillOval(x + 2, y - 8, 5, 5);  // Sağ kulak
+
+        // Ayaklar
+        gc.setFill(Color.BLACK);
+        gc.fillRect(x + 5, y + 25, 4, 7);   // Sol ön ayak
+        gc.fillRect(x + 30, y + 25, 4, 7);  // Sağ arka ayak
+
+        // Kuyruk
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(2);
+        gc.strokeLine(x + 40, y + 10, x + 48, y + 15);
+        gc.setFill(Color.BLACK);
+        gc.fillOval(x + 46, y + 13, 4, 4); // Kuyruğun ucu
+    }
+
     //Araç çizimi
     private void drawVehicle(double x, double y, String type) {
         if (type.equals("car")) {
-            gc.setFill(Color.HOTPINK);
+            gc.setFill(Color.DARKRED);
             gc.fillRect(x - 15, y - 7, 30, 14); // Car body
             gc.setFill(Color.BLACK);
             gc.fillOval(x - 10, y + 2, 5, 5); // Left wheel
             gc.fillOval(x + 5, y + 2, 5, 5); // Right wheel
         } else if (type.equals("truck")) {
-            gc.setFill(Color.MEDIUMPURPLE);
+            gc.setFill(Color.DARKSLATEBLUE);
             gc.fillRect(x - 20, y - 10, 40, 20); // Truck body
             gc.setFill(Color.BLACK);
             gc.fillOval(x - 15, y + 5, 6, 6); // Left front wheel
             gc.fillOval(x - 5, y + 5, 6, 6); // Left rear wheel
             gc.fillOval(x + 9, y + 5, 6, 6); // Right rear wheel
         } else if (type.equals("ambulance")) {
-            gc.setFill(Color.WHITE);
+            gc.setFill(Color.WHITESMOKE);
             gc.fillRect(x - 15, y - 7, 30, 14); // Ambulance body
             gc.setFill(Color.RED);
             gc.fillRect(x - 5, y - 3, 10, 6); // Red cross
@@ -233,14 +297,14 @@ public class TrafficView {
         gc.setFill(Color.GREEN); // Grass background
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Draw roads
+        // Yol çizimi
         gc.setFill(Color.GRAY);
         gc.fillRect(0, 250, 250, 100); // West road
         gc.fillRect(350, 250, 250, 100); // East road
         gc.fillRect(250, 0, 100, 250); // North road
         gc.fillRect(250, 350, 100, 250); // South road
 
-        // Draw dashed yellow center lines
+        // Yol şerit çizimi
         gc.setStroke(Color.YELLOW);
         gc.setLineWidth(3);
         gc.setLineDashes(10, 10);
@@ -250,7 +314,7 @@ public class TrafficView {
         gc.strokeLine(300, 350, 300, 600); // South road center
         gc.setLineDashes(null);
 
-        // Draw intersection
+        //Kavşak çizimi
         gc.setFill(Color.GRAY);
         gc.fillRect(250, 250, 100, 100);
 
@@ -260,17 +324,37 @@ public class TrafficView {
 
         // Bahçeye çiçekler ekle
         drawFlower(gc, 30, 30, Color.PINK, Color.YELLOW);
-        drawFlower(gc, 50, 50, Color.LIGHTBLUE, Color.ORANGE);
-        drawFlower(gc, 35, 40, Color.PURPLE, Color.WHITE);
+        drawFlower(gc, 100, 65, Color.LIGHTBLUE, Color.ORANGE);
+        drawFlower(gc, 40, 100, Color.DARKRED, Color.WHITE);
+        drawFlower(gc, 180, 100, Color.RED, Color.WHITE);
+        drawFlower(gc, 410, 400, Color.HOTPINK, Color.WHITE);
+        drawFlower(gc, 40, 460, Color.MEDIUMPURPLE, Color.WHITE);
+        drawFlower(gc, 210, 480, Color.YELLOWGREEN, Color.WHITE);
+        drawFlower(gc, 440, 60, Color.YELLOW, Color.WHITE);
+        drawFlower(gc, 180, 30, Color.ORANGE, Color.WHITE);
+        drawFlower(gc, 570, 80, Color.DARKBLUE, Color.WHITE);
+        drawFlower(gc, 190, 570, Color.SADDLEBROWN, Color.WHITE);
+        drawFlower(gc, 60, 580, Color.DARKSLATEBLUE, Color.WHITE);
+        drawFlower(gc, 420, 570, Color.BROWN, Color.WHITE);
+        drawFlower(gc, 550, 580, Color.DARKSLATEBLUE, Color.WHITE);
 
+        // Ördek çizimi
+        drawDuck(gc, 30, 210); // Sol üst yeşil alana yerleştirildi.
+        drawDuck(gc, 380, 180); // Sağ üst yeşil alana yerleştirildi
+        drawDuck(gc, 90, 480); // Sol alt yeşil alana yerleştirildi
+        drawDuck(gc, 500, 480);
 
-        // Draw trees
+        // İnek çizimi
+        drawCow(gc, 40, 400);
+        drawCow(gc, 500, 400);
+
+        // Ağaç çizimi
         drawTree(gc, 170, 180);
         drawTree(gc, 430, 180);
         drawTree(gc, 170, 420);
         drawTree(gc, 430, 420);
 
-        // Draw crosswalks (zebra crossings)
+        // Yaya geçidi çizimi
         drawCrosswalk(180, 250, false); // West
 
         // Trafik ışıklarının renklendirilmesi
@@ -281,7 +365,7 @@ public class TrafficView {
         drawTrafficLightHorizontal(350, 220, phase == 0 ? "green" : (phase == 1)||(phase==7)  ? "yellow" : "red"); // west
         drawTrafficLightHorizontal(160, 350, phase == 4 ? "green" : (phase == 3)||(phase==5)  ? "yellow" : "red"); // east
 
-        // Draw vehicles
+        // Araç çizimi
         List<Vehicle>[] vehicles = controller.getModel().getVehicles();
         for (int i = 0; i < 4; i++) {
             for (Vehicle vehicle : vehicles[i]) {

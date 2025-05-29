@@ -13,9 +13,10 @@ public class TrafficModel {
     private int[] vehicleCounts = new int[4]; // North, South, East, West
     private int[] greenDurations = new int[4];
     private List<Vehicle>[] vehicles = new ArrayList[4]; // Yöne göre araçlar
-    private int currentPhase = 0; // 0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
+    private int currentPhase = 0; // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
     private double remainingTime = 0;
     private boolean isRunning = false;
+    private boolean isPaused = false;
 
     public TrafficModel() {
         for (int i = 0; i < 4; i++) {
@@ -23,8 +24,7 @@ public class TrafficModel {
         }
     }
 
-    //0: north, 1: south, 2: east, 3: west
-    //yönlerdeki araç sayıları
+    // araç sayılarını alır
     public void setVehicleCounts(int north, int south, int east, int west) {
         vehicleCounts[0] = Math.max(0, north);
         vehicleCounts[1] = Math.max(0, south);
@@ -36,11 +36,10 @@ public class TrafficModel {
 
     public void generateRandomCounts() {
         Random rand = new Random();
-        //max 100 araç
-        vehicleCounts[0] = rand.nextInt(101);
-        vehicleCounts[1] = rand.nextInt(101);
-        vehicleCounts[2] = rand.nextInt(101);
-        vehicleCounts[3] = rand.nextInt(101);
+        vehicleCounts[0] = rand.nextInt(41);
+        vehicleCounts[1] = rand.nextInt(41);
+        vehicleCounts[2] = rand.nextInt(41);
+        vehicleCounts[3] = rand.nextInt(41);
         calculateGreenDurations();
         generateVehicles();
     }
@@ -48,37 +47,20 @@ public class TrafficModel {
     private void calculateGreenDurations() {
         int totalVehicles = vehicleCounts[0] + vehicleCounts[1] + vehicleCounts[2] + vehicleCounts[3];
 
-        if(vehicleCounts[0] == 0) {greenDurations[0] = 0;}//N
-        else if(vehicleCounts[1] == 0) {greenDurations[1] = 0;}//S
-        else if(vehicleCounts[2] == 0) {greenDurations[2] = 0;}//E
-        else if(vehicleCounts[3] == 0) {greenDurations[3] = 0;}//W
-
-        double[] percentages = new double[4]; //o yoldaki araç sayısı/ toplam araç sayısı= yüzde
+        double[] percentages = new double[4]; // o yoldaki araç sayısı / toplam araç sayısı = yüzde
         for (int i = 0; i < 4; i++) {
             percentages[i] = (double) vehicleCounts[i] / totalVehicles;
         }
 
-        //  toplam 120 saniye
-        double nPercentage = percentages[0] ;
-        double sPercentage= percentages[1];
-        double ePercentage = percentages[2];
-        double wPercentage = percentages[3];
-        int nGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * nPercentage)));
-        int sGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * sPercentage)));
-        int eGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * ePercentage)));
-        int wGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * wPercentage)));
-//0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
-        //0: north, 1: south, 2: east, 3: west
-        greenDurations[0] = nGreenTotal;
-        greenDurations[1] = sGreenTotal;
-        greenDurations[2] = eGreenTotal;
-        greenDurations[3] = wGreenTotal;
-
-        // minimum yeşil yanma süresine uygunluk
-        for (int i = 0; i < 4; i++) {
-            greenDurations[i] = Math.max(MIN_GREEN, greenDurations[i]);
-            greenDurations[i] = Math.min(MAX_GREEN, greenDurations[i]);
+        // 0: north, 1: south, 2: east, 3: west
+        greenDurations[0] = Math.min(MAX_GREEN, Math.max(MIN_GREEN, (int) (TOTAL_CYCLE_TIME * percentages[0]))); // North
+        greenDurations[1] = Math.min(MAX_GREEN, Math.max(MIN_GREEN, (int) (TOTAL_CYCLE_TIME * percentages[1]))); // South
+        greenDurations[2] = Math.min(MAX_GREEN, Math.max(MIN_GREEN, (int) (TOTAL_CYCLE_TIME * percentages[2]))); // East
+        greenDurations[3] = Math.min(MAX_GREEN, Math.max(MIN_GREEN, (int) (TOTAL_CYCLE_TIME * percentages[3]))); // West
+        for (int i = 0; i < 4; i++) { // hiç araç yoksa 10 saniye yeşil yansın
+            if(vehicleCounts[i] == 0) {greenDurations[i] = 0;}
         }
+
     }
 
     private void generateVehicles() {
@@ -86,83 +68,76 @@ public class TrafficModel {
         for (int i = 0; i < 4; i++) {
             vehicles[i].clear();
             for (int j = 0; j < vehicleCounts[i]; j++) {
-                // Araç tipini rastgele atama
                 String type = rand.nextInt(3) == 0 ? "car" : rand.nextInt(2) == 0 ? "truck" : "ambulance";
                 String turn = "straight";
-                vehicles[i].add(new Vehicle(i, j * 60, type, turn)); // Increased spacing to 60 pixels
+                vehicles[i].add(new Vehicle(i, j * 90, type, turn)); // Increased spacing to 90 pixels
             }
         }
     }
-    //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
+
+    //0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
     public void update(double deltaTime) {
-        if (!isRunning) return;
+        if (!isRunning || isPaused) return; //durma duraklatma kontrolü
 
         remainingTime -= deltaTime;
-        if (remainingTime <= 0) {
+        if (remainingTime <= 0) {//remainingTime şu anki trafik ışığının bitmesine kalan süre
             advancePhase();
         }
 
-        // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
-        if (currentPhase >= 0 && currentPhase <= 7) {
-            // Her faz için aynı işlem
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
+        for (int i = 0; i < 4; i++) {
+            moveVehiclesWithPriority(i, deltaTime);
         }
-        //0: north, 1: south, 2: east, 3: west
     }
 
-    // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
     private void advancePhase() {
-        currentPhase = (currentPhase + 1) % 8; //currentPhase 0’dan 7’ye kadar döner
+        currentPhase = (currentPhase + 1) % 8;
 
-        // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         switch (currentPhase) {
-            case 0: // West Green
-                remainingTime = greenDurations[3]; // Batı
+            case 0: // W Green
+                remainingTime = greenDurations[3]; // West
                 break;
-            case 1: // West to North Yellow
+            case 1: // WN Yellow
                 remainingTime = YELLOW_DURATION;
                 break;
-            case 2: // North Green
-                remainingTime = greenDurations[0]; // Kuzey
+            case 2: // N Green
+                remainingTime = greenDurations[0]; // North
                 break;
-            case 3: // North to East Yellow
+            case 3: // NE Yellow
                 remainingTime = YELLOW_DURATION;
                 break;
-            case 4: // East Green
-                remainingTime = greenDurations[2]; // Doğu
+            case 4: // E Green
+                remainingTime = greenDurations[2]; // East
                 break;
-            case 5: // East to South Yellow
+            case 5: // ES Yellow
                 remainingTime = YELLOW_DURATION;
                 break;
-            case 6: // South Green
-                remainingTime = greenDurations[1]; // Güney
+            case 6: // S Green
+                remainingTime = greenDurations[1]; // South
                 break;
-            case 7: // South to West Yellow
+            case 7: // SW Yellow
                 remainingTime = YELLOW_DURATION;
                 break;
         }
     }
 
-    // direction 0: North, 1: South, 2: East, 3: West
-    // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
     private void moveVehiclesWithPriority(int direction, double deltaTime) {
         List<Vehicle> toRemove = new ArrayList<>();
         Vehicle prevVehicle = null;
         vehicles[direction].sort(Comparator.comparingDouble(Vehicle::getPosition).reversed());
 
         for (Vehicle vehicle : vehicles[direction]) {
-            // Check if vehicle should stop (red or yellow and not past intersection)
-            int phase = getCurrentPhase(); //Trafik ışıklarının hangi fazda olduğunu belirtir (0–3 arası).
-            boolean isGreen = (direction == 3 && phase == 0) || (direction == 0 && phase == 2)|| (direction  == 2 && phase == 4)||(direction == 1 && phase == 6);
-            boolean isYellow = (((direction==0)||(direction==3)) && phase == 1) || (((direction==0)||(direction==2)) && phase == 3)||(((direction==1)||(direction==2)) && phase == 5)||(((direction==1)||(direction==3)) && phase == 7);
+            int phase = getCurrentPhase();
+            boolean isGreen = (direction == 3 && phase == 0) || (direction == 0 && phase == 2) || (direction == 2 && phase == 4) || (direction == 1 && phase == 6);
+            boolean isYellow = (((direction == 0) || (direction == 3)) && phase == 1) ||
+                    (((direction == 0) || (direction == 2)) && phase == 3) ||
+                    (((direction == 1) || (direction == 2)) && phase == 5) ||
+                    (((direction == 1) || (direction == 3)) && phase == 7);
+
             if (!isGreen && (isYellow && vehicle.getPosition() < -20)) {
-                continue; // Stop if yellow and not past intersection//BENCE BREAK YAPILABİLİR
+                continue; // sarıysa ve kavşağı geçmediyse dur
             }
 
-            // Önceki araçla çarpışmayı önle
+            //çarpışma kontrolü
             if (prevVehicle != null) {
                 double dx = prevVehicle.getActualX() - vehicle.getActualX();
                 double dy = prevVehicle.getActualY() - vehicle.getActualY();
@@ -170,25 +145,21 @@ public class TrafficModel {
 
                 double minDistance = prevVehicle.getType().equals("truck") ? 80 : 60;
                 if (distance < minDistance) {
-                    continue; // Çok yakın, ilerleme
+                    continue; // çok yaklaştınnn
                 }
             }
 
-            if ((vehicle.hasPassedIntersection())||((!vehicle.hasPassedIntersection())&&isGreen)) {
-                //toRemove.add(vehicle);
+            if (vehicle.hasPassedIntersection() || (!vehicle.hasPassedIntersection() && isGreen)) {
                 vehicle.move(deltaTime);
             }
+
             prevVehicle = vehicle;
         }
-        vehicles[direction].removeAll(toRemove); //Kavşağı geçen araçlar ana listeden çıkarılır.
+        vehicles[direction].removeAll(toRemove);
     }
 
     public int[] getVehicleCounts() {
         return vehicleCounts;
-    }
-
-    public int[] getGreenDurations() {
-        return greenDurations;
     }
 
     public List<Vehicle>[] getVehicles() {
@@ -203,33 +174,40 @@ public class TrafficModel {
         return remainingTime;
     }
 
-    public void resumeSimulation() {
-        if (!isRunning && remainingTime > 0) {
-            isRunning = true;
-        }
-    }
-
+    // Control simulation state methods
     public void startSimulation() {
         calculateGreenDurations();
         isRunning = true;
+        isPaused = false;
         currentPhase = 0;
-        remainingTime = greenDurations[currentPhase];
+        remainingTime = greenDurations[3]; // West green starts first
     }
+
     public void pauseSimulation() {
-        isRunning = false;
-    }
-
-
-    public void resetSimulation() {
-        isRunning = false;
-        currentPhase = 0;
-        remainingTime = 0;
-        for (int i = 0; i < 4; i++) {
-            vehicles[i].clear();
+        if (isRunning && !isPaused) {
+            isPaused = true;
         }
     }
 
-    /*public boolean isRunning() {
-        return isRunning;
-    }*/
+    public void resumeSimulation() {
+        if (isRunning && isPaused) {
+            isPaused = false;
+        }
+    }
+
+    public void stopSimulation() {
+        isRunning = false;
+        isPaused = false;
+    }
+
+    public void resetSimulation() {
+        stopSimulation();
+        currentPhase = 0;
+        remainingTime = 0;
+        for (int i = 0; i < 4; i++) {
+            vehicleCounts[i] = 0;
+            greenDurations[i] = 0;
+            vehicles[i].clear();
+        }
+    }
 }
