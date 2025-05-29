@@ -58,64 +58,23 @@ public class TrafficView {
         inputPanel.setPadding(new Insets(10));
         String[] directions = {"South", "North", "West", "East"};
 
-        timerLabels[3] = new Label("0.0s");
+        timerLabels[0] = new Label("0.0s");
         timerLabels[1] = new Label("0.0s");
         timerLabels[2] = new Label("0.0s");
-        timerLabels[0] = new Label("0.0s");
+        timerLabels[3] = new Label("0.0s");
         for (int i = 0; i < 4; i++) {
-            if (i == 0) {
-                HBox row = new HBox(10);
-                final TextField densityField = new TextField("0");
-                densityFields[i] = densityField;
+            HBox row = new HBox(10);
+            final TextField densityField = new TextField("0");
+            densityFields[i] = densityField;
 
-                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
-                        new Label("Timer:"), timerLabels[3]);
-                inputPanel.getChildren().add(row);
-                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
-                    if (!newVal.matches("\\d*")) {
-                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
-                    }
-                });
-            }else if(i==1) {
-                HBox row = new HBox(10);
-                final TextField densityField = new TextField("0");
-                densityFields[i] = densityField;
-
-                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
-                        new Label("Timer:"), timerLabels[i]);
-                inputPanel.getChildren().add(row);
-                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
-                    if (!newVal.matches("\\d*")) {
-                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
-                    }
-                });
-            }else if(i==2) {
-                HBox row = new HBox(10);
-                final TextField densityField = new TextField("0");
-                densityFields[i] = densityField;
-
-                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
-                        new Label("Timer:"), timerLabels[i]);
-                inputPanel.getChildren().add(row);
-                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
-                    if (!newVal.matches("\\d*")) {
-                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
-                    }
-                });
-            }else if(i==3) {
-                HBox row = new HBox(10);
-                final TextField densityField = new TextField("0");
-                densityFields[3] = densityField;
-
-                row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
-                        new Label("Timer:"), timerLabels[0]);
-                inputPanel.getChildren().add(row);
-                densityField.textProperty().addListener((obs, oldVal, newVal) -> {
-                    if (!newVal.matches("\\d*")) {
-                        densityField.setText(newVal.replaceAll("[^\\d]", ""));
-                    }
-                });
-            }
+            row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityField,
+                    new Label("Timer:"), timerLabels[i]);
+            inputPanel.getChildren().add(row);
+            densityField.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal.matches("\\d*")) {
+                    densityField.setText(newVal.replaceAll("[^\\d]", ""));
+                }
+            });
         }
 
         // Kontrol düğmeleri
@@ -328,44 +287,19 @@ public class TrafficView {
             for (Vehicle vehicle : vehicles[i]) {
                 double pos = vehicle.getPosition();
                 double x = 0, y = 0;
-                double angle = vehicle.isTurning() ? vehicle.getTurnAngle() : 0;
                 gc.save();
                 if (i == 0) { // North
                     x = 325;
                     y = 340 - pos;
-                    if (vehicle.isTurning()) {
-                        gc.translate(x, y);
-                        gc.rotate(-angle * (vehicle.getTurn().equals("left") ? 1 : -1));
-                        x = 0;
-                        y = 0;
-                    }
                 } else if (i == 1) { // South
                     x = 275;
                     y = 260 + pos;
-                    if (vehicle.isTurning()) {
-                        gc.translate(x, y);
-                        gc.rotate(angle * (vehicle.getTurn().equals("left") ? 1 : -1));
-                        x = 0;
-                        y = 0;
-                    }
                 } else if (i == 2) { // East
                     x = 250 + pos;
                     y = 325;
-                    if (vehicle.isTurning()) {
-                        gc.translate(x, y);
-                        gc.rotate(angle * (vehicle.getTurn().equals("left") ? -1 : 1));
-                        x = 0;
-                        y = 0;
-                    }
                 } else { // West
                     x = 350 - pos;
                     y = 275;
-                    if (vehicle.isTurning()) {
-                        gc.translate(x, y);
-                        gc.rotate(-angle * (vehicle.getTurn().equals("left") ? -1 : 1));
-                        x = 0;
-                        y = 0;
-                    }
                 }
                 drawVehicle(x, y, vehicle.getType());
                 gc.restore();
@@ -374,10 +308,10 @@ public class TrafficView {
 
         // Zamanlayıcıyı güncelle
         double remaining = controller.getModel().getRemainingTime();
-        timerLabels[3].setText(phase == 2 ? String.format("%.1fs", remaining) : "0.0s"); // North
+        timerLabels[0].setText(phase == 2 ? String.format("%.1fs", remaining) : "0.0s"); // North
         timerLabels[1].setText(phase == 6 ? String.format("%.1fs", remaining) : "0.0s"); // South
         timerLabels[2].setText(phase == 4 ? String.format("%.1fs", remaining) : "0.0s"); // East
-        timerLabels[0].setText(phase == 0 ? String.format("%.1fs", remaining) : "0.0s"); // West
+        timerLabels[3].setText(phase == 0 ? String.format("%.1fs", remaining) : "0.0s"); // West
     }
 
     public TextField[] getDensityFields() {

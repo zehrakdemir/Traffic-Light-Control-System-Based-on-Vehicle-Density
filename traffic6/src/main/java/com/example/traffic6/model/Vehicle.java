@@ -6,7 +6,7 @@ public class Vehicle {
     private String type; // car, truck, ambulance
     private String turn; // Aracın dönüş yönü (right, left ya da straight)
     private static final double SPEED = 50;
-    private static final double SPEED2=500;
+
     // Pixels per second
     private double turnAngle = 0; // Dönüş sırasında aracın döndüğü açı.
     private boolean isTurning = false; //Aracın şu anda dönüp dönmediğini belirten flag.
@@ -41,12 +41,11 @@ public class Vehicle {
         this.direction = direction;
         this.position = -initialPosition - 30;
         this.type = type;
-        this.turn = turn;
+        //this.turn = turn;
     }
 
     public void move(double deltaTime) {
         position += SPEED * deltaTime;
-
     }
 
 
@@ -66,15 +65,4 @@ public class Vehicle {
         return type;
     }
 
-    public String getTurn() {
-        return turn;
-    }
-
-    public double getTurnAngle() {
-        return turnAngle;
-    }
-
-    public boolean isTurning() {
-        return isTurning;
-    }
 }

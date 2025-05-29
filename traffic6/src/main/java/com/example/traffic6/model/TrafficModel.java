@@ -36,24 +36,22 @@ public class TrafficModel {
 
     public void generateRandomCounts() {
         Random rand = new Random();
-        vehicleCounts[0] = rand.nextInt(41);
-        vehicleCounts[1] = rand.nextInt(41);
-        vehicleCounts[2] = rand.nextInt(41);
-        vehicleCounts[3] = rand.nextInt(41);
+        //max 100 araç
+        vehicleCounts[0] = rand.nextInt(101);
+        vehicleCounts[1] = rand.nextInt(101);
+        vehicleCounts[2] = rand.nextInt(101);
+        vehicleCounts[3] = rand.nextInt(101);
         calculateGreenDurations();
         generateVehicles();
     }
 
     private void calculateGreenDurations() {
         int totalVehicles = vehicleCounts[0] + vehicleCounts[1] + vehicleCounts[2] + vehicleCounts[3];
-        if (totalVehicles == 0) {
-            for (int i = 0; i < 4; i++) {//hiç araç yoksa 10 saniye yeşil yansın
-                greenDurations[i] = MIN_GREEN;
-            }
-            return;
-        }
 
-
+        if(vehicleCounts[0] == 0) {greenDurations[0] = 0;}//N
+        else if(vehicleCounts[1] == 0) {greenDurations[1] = 0;}//S
+        else if(vehicleCounts[2] == 0) {greenDurations[2] = 0;}//E
+        else if(vehicleCounts[3] == 0) {greenDurations[3] = 0;}//W
 
         double[] percentages = new double[4]; //o yoldaki araç sayısı/ toplam araç sayısı= yüzde
         for (int i = 0; i < 4; i++) {
@@ -61,21 +59,21 @@ public class TrafficModel {
         }
 
         //  toplam 120 saniye
-        double nPercentage = percentages[3] ;
+        double nPercentage = percentages[0] ;
         double sPercentage= percentages[1];
         double ePercentage = percentages[2];
-        double wPercentage = percentages[0];
+        double wPercentage = percentages[3];
         int nGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * nPercentage)));
         int sGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * sPercentage)));
         int eGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * ePercentage)));
         int wGreenTotal = Math.max(MIN_GREEN , Math.min(MAX_GREEN * 2, (int) (TOTAL_CYCLE_TIME * wPercentage)));
 //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
-        // int[] greenDurations = new int[4];
-        greenDurations[3] = nGreenTotal;
+        //0: north, 1: south, 2: east, 3: west
+        greenDurations[0] = nGreenTotal;
         greenDurations[1] = sGreenTotal;
         greenDurations[2] = eGreenTotal;
-        greenDurations[0] = wGreenTotal;
-//0: north, 1: south, 2: east, 3: west
+        greenDurations[3] = wGreenTotal;
+
         // minimum yeşil yanma süresine uygunluk
         for (int i = 0; i < 4; i++) {
             greenDurations[i] = Math.max(MIN_GREEN, greenDurations[i]);
@@ -88,10 +86,9 @@ public class TrafficModel {
         for (int i = 0; i < 4; i++) {
             vehicles[i].clear();
             for (int j = 0; j < vehicleCounts[i]; j++) {
-
                 // Araç tipini rastgele atama
                 String type = rand.nextInt(3) == 0 ? "car" : rand.nextInt(2) == 0 ? "truck" : "ambulance";
-                String turn = "straight"; //rand.nextInt(3) == 0 ? "left" : rand.nextInt(2) == 0 ? "right" : sildim
+                String turn = "straight";
                 vehicles[i].add(new Vehicle(i, j * 60, type, turn)); // Increased spacing to 60 pixels
             }
         }
@@ -105,67 +102,23 @@ public class TrafficModel {
             advancePhase();
         }
 
-        // Yeşil ışıkta araçları hareket ettir
-        //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
-        if (currentPhase == 0) {
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
-        } else if (currentPhase == 2) {
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
-        } else if (currentPhase == 4) {
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
-        } else if (currentPhase == 6) {
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
-        }else if (currentPhase == 1) {
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
-        }else if (currentPhase == 3) {
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
-        }else if (currentPhase == 5) {
-            moveVehiclesWithPriority(0, deltaTime);
-            moveVehiclesWithPriority(1, deltaTime);
-            moveVehiclesWithPriority(2, deltaTime);
-            moveVehiclesWithPriority(3, deltaTime);
-        }else if (currentPhase == 7) {
+        if (currentPhase >= 0 && currentPhase <= 7) {
+            // Her faz için aynı işlem
             moveVehiclesWithPriority(0, deltaTime);
             moveVehiclesWithPriority(1, deltaTime);
             moveVehiclesWithPriority(2, deltaTime);
             moveVehiclesWithPriority(3, deltaTime);
         }
-
         //0: north, 1: south, 2: east, 3: west
     }
-    //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
+
     // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
     private void advancePhase() {
-        currentPhase = (currentPhase + 1) % 8;
+        currentPhase = (currentPhase + 1) % 8; //currentPhase 0’dan 7’ye kadar döner
 
+        // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         switch (currentPhase) {
-            /*greenDurations[0] = nGreenTotal;
-        greenDurations[1] = sGreenTotal;
-        greenDurations[2] = eGreenTotal;
-        greenDurations[3] = wGreenTotal;*/
-           /* greenDurations[3] = nGreenTotal;
-            greenDurations[1] = sGreenTotal;
-            greenDurations[2] = eGreenTotal;
-            greenDurations[0] = wGreenTotal;*/
             case 0: // West Green
                 remainingTime = greenDurations[3]; // Batı
                 break;
@@ -276,7 +229,7 @@ public class TrafficModel {
         }
     }
 
-    public boolean isRunning() {
+    /*public boolean isRunning() {
         return isRunning;
-    }
+    }*/
 }

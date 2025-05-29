@@ -14,7 +14,6 @@ public class TrafficController {
         view.setController(this);
     }
 
-
    public void startSimulation() {
        try {
            TextField[] fields = view.getDensityFields();
@@ -45,8 +44,6 @@ public class TrafficController {
         view.render();
     }
 
-
-
     public void generateRandomCounts() {
         model.generateRandomCounts();
         view.updateVehicleCounts(model.getVehicleCounts());
@@ -55,7 +52,6 @@ public class TrafficController {
     public void update(double deltaTime) {
         model.update(deltaTime);
     }
-
 
     public TrafficModel getModel() {
         return model;
