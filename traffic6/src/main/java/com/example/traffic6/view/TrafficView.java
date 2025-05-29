@@ -16,8 +16,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
-import java.awt.*;
 import java.util.List;
 
 public class TrafficView {
@@ -59,14 +57,7 @@ public class TrafficView {
         VBox inputPanel = new VBox(10);
         inputPanel.setPadding(new Insets(10));
         String[] directions = {"South", "North", "West", "East"};
-        /*for (int i = 0; i < 4; i++) {
-            HBox row = new HBox(10);
-            densityFields[i] = new TextField("0");
-            timerLabels[i] = new Label("0s");
-            row.getChildren().addAll(new Label(directions[i] + " Vehicles:"), densityFields[i],
-                    new Label("Timer:"), timerLabels[i]);
-            inputPanel.getChildren().add(row);
-        }*/
+
         timerLabels[3] = new Label("0.0s");
         timerLabels[1] = new Label("0.0s");
         timerLabels[2] = new Label("0.0s");
@@ -127,9 +118,7 @@ public class TrafficView {
             }
         }
 
-
-
-        // Control buttons (converted to local variables as suggested)
+        // Kontrol düğmeleri
         HBox controls = new HBox(10);
         Button startButton = new Button("Start");
         Button pauseButton = new Button("Pause");
@@ -143,21 +132,23 @@ public class TrafficView {
         root.setTop(inputPanel);
         root.setCenter(canvas);
 
-        // Event handlers
+        // Buton işlevleri
         startButton.setOnAction(e -> controller.startSimulation());
         pauseButton.setOnAction(e -> controller.pauseSimulation());
         resetButton.setOnAction(e -> controller.resetSimulation());
         randomButton.setOnAction(e -> controller.generateRandomCounts());
         resumeButton.setOnAction(e -> controller.resumeSimulation());
 
-        // Start the animation timer
+        // zamanlayıcıyı başlatır
         timer.start();
 
         Scene scene = new Scene(root, 700, 700);
-        primaryStage.setTitle("Traffic Light Simulation");
+        primaryStage.setTitle("TRAFFIC LIGHT SIMULATION");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+    //Ağaç çizimi
     private void drawTree(GraphicsContext gc, double x, double y) {
         gc.setFill(Color.BROWN);
         gc.fillRect(x, y, 10, 20); // Gövde
@@ -165,6 +156,7 @@ public class TrafficView {
         gc.fillOval(x - 10, y - 20, 30, 30); // Yapraklar
     }
 
+    //Ev çizimi
     private void drawHouse(GraphicsContext gc, double x, double y) {
         // Ev gövdesi
         gc.setFill(Color.BEIGE);
@@ -184,6 +176,7 @@ public class TrafficView {
         gc.fillRect(x + 55, y + 15, 15, 15);
     }
 
+    //Yaya geçidi çizimi
     private void drawCrosswalk(double startX, double startY, boolean horizontal) {  //yaya geçidi
         gc.setFill(Color.WHITE);
         int stripeCount = 7;
@@ -200,6 +193,81 @@ public class TrafficView {
         }
     }
 
+    //Dikey trafik ışığı çizimi
+    private void drawTrafficLight(double x, double y, String activeLight) {
+        gc.setFill(Color.BLACK);
+        gc.fillRect(x, y, 30, 90);
+        gc.setFill(activeLight.equals("red") ? Color.RED : Color.GRAY);
+        gc.fillOval(x + 5, y + 5, 20, 20);
+        gc.setFill(activeLight.equals("yellow") ? Color.YELLOW : Color.GRAY);
+        gc.fillOval(x + 5, y + 35, 20, 20);
+        gc.setFill(activeLight.equals("green") ? Color.GREEN : Color.GRAY);
+        gc.fillOval(x + 5, y + 65, 20, 20);
+    }
+
+    //Yatay trafik ışığı çizimi
+    private void drawTrafficLightHorizontal(double x, double y, String activeLight) {
+        gc.setFill(Color.BLACK);
+        gc.fillRect(x, y, 90, 30); // Yatay siyah kutu (3 ışık için 30x30'luk kutular)
+
+        // Kırmızı ışık (solda)
+        gc.setFill(activeLight.equals("red") ? Color.RED : Color.GRAY);
+        gc.fillOval(x + 5, y + 5, 20, 20);
+
+        // Sarı ışık (ortada)
+        gc.setFill(activeLight.equals("yellow") ? Color.YELLOW : Color.GRAY);
+        gc.fillOval(x + 35, y + 5, 20, 20);
+
+        // Yeşil ışık (sağda)
+        gc.setFill(activeLight.equals("green") ? Color.GREEN : Color.GRAY);
+        gc.fillOval(x + 65, y + 5, 20, 20);
+    }
+
+    //Çiçek çizimi
+    public static void drawFlower(GraphicsContext gc, double centerX, double centerY, Color petalColor, Color centerColor) {
+        double petalRadius = 10;
+        int petals = 3;
+
+        gc.setFill(petalColor);
+
+        // Yaprakları çiz
+        for (int i = 0; i < petals; i++) {
+            double angle = 2 * Math.PI / petals * i;
+            double x = centerX + Math.cos(angle) * petalRadius;
+            double y = centerY + Math.sin(angle) * petalRadius;
+            gc.fillOval(x - petalRadius, y - petalRadius, petalRadius * 2, petalRadius * 2);
+        }
+
+        // Orta kısmı çiz
+        gc.setFill(centerColor);
+        gc.fillOval(centerX - petalRadius / 2, centerY - petalRadius / 2, petalRadius, petalRadius);
+    }
+
+    //Araç çizimi
+    private void drawVehicle(double x, double y, String type) {
+        if (type.equals("car")) {
+            gc.setFill(Color.HOTPINK);
+            gc.fillRect(x - 15, y - 7, 30, 14); // Car body
+            gc.setFill(Color.BLACK);
+            gc.fillOval(x - 10, y + 2, 5, 5); // Left wheel
+            gc.fillOval(x + 5, y + 2, 5, 5); // Right wheel
+        } else if (type.equals("truck")) {
+            gc.setFill(Color.MEDIUMPURPLE);
+            gc.fillRect(x - 20, y - 10, 40, 20); // Truck body
+            gc.setFill(Color.BLACK);
+            gc.fillOval(x - 15, y + 5, 6, 6); // Left front wheel
+            gc.fillOval(x - 5, y + 5, 6, 6); // Left rear wheel
+            gc.fillOval(x + 9, y + 5, 6, 6); // Right rear wheel
+        } else if (type.equals("ambulance")) {
+            gc.setFill(Color.WHITE);
+            gc.fillRect(x - 15, y - 7, 30, 14); // Ambulance body
+            gc.setFill(Color.RED);
+            gc.fillRect(x - 5, y - 3, 10, 6); // Red cross
+            gc.setFill(Color.BLACK);
+            gc.fillOval(x - 10, y + 2, 5, 5); // Left wheel
+            gc.fillOval(x + 5, y + 2, 5, 5); // Right wheel
+        }
+    }
 
     public void render() {
         // Clear canvas
@@ -231,7 +299,6 @@ public class TrafficView {
         drawHouse(gc, 70, 140);
         drawHouse(gc, 460, 140);
 
-
         // Bahçeye çiçekler ekle
         drawFlower(gc, 30, 30, Color.PINK, Color.YELLOW);
         drawFlower(gc, 50, 50, Color.LIGHTBLUE, Color.ORANGE);
@@ -239,28 +306,21 @@ public class TrafficView {
 
 
         // Draw trees
-
         drawTree(gc, 170, 180);
         drawTree(gc, 430, 180);
         drawTree(gc, 170, 420);
         drawTree(gc, 430, 420);
 
         // Draw crosswalks (zebra crossings)
-        //drawCrosswalk(250, 180, true);  // North
-        //drawCrosswalk(250, 380, true);  // South
         drawCrosswalk(180, 250, false); // West
-        //drawCrosswalk(380, 250, false); // East
 
-
-
-        // Draw traffic lights (outside roads)
+        // Trafik ışıklarının renklendirilmesi
         int phase = controller.getModel().getCurrentPhase();
         drawTrafficLight(350, 350, phase == 2  ? "green" : (phase == 1)||(phase==3) ? "yellow" : "red"); // North
         drawTrafficLight(220, 160, phase == 6 ? "green" : (phase == 5)||(phase==7) ? "yellow" : "red"); // South
 
         drawTrafficLightHorizontal(350, 220, phase == 0 ? "green" : (phase == 1)||(phase==7)  ? "yellow" : "red"); // west
         drawTrafficLightHorizontal(160, 350, phase == 4 ? "green" : (phase == 3)||(phase==5)  ? "yellow" : "red"); // east
-
 
         // Draw vehicles
         List<Vehicle>[] vehicles = controller.getModel().getVehicles();
@@ -312,7 +372,7 @@ public class TrafficView {
             }
         }
 
-        // Update timers
+        // Zamanlayıcıyı güncelle
         double remaining = controller.getModel().getRemainingTime();
         timerLabels[3].setText(phase == 2 ? String.format("%.1fs", remaining) : "0.0s"); // North
         timerLabels[1].setText(phase == 6 ? String.format("%.1fs", remaining) : "0.0s"); // South
@@ -320,87 +380,10 @@ public class TrafficView {
         timerLabels[0].setText(phase == 0 ? String.format("%.1fs", remaining) : "0.0s"); // West
     }
 
-    private void drawTrafficLight(double x, double y, String activeLight) {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(x, y, 30, 90);
-        gc.setFill(activeLight.equals("red") ? Color.RED : Color.GRAY);
-        gc.fillOval(x + 5, y + 5, 20, 20);
-        gc.setFill(activeLight.equals("yellow") ? Color.YELLOW : Color.GRAY);
-        gc.fillOval(x + 5, y + 35, 20, 20);
-        gc.setFill(activeLight.equals("green") ? Color.GREEN : Color.GRAY);
-        gc.fillOval(x + 5, y + 65, 20, 20);
-    }
-
-    private void drawTrafficLightHorizontal(double x, double y, String activeLight) {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(x, y, 90, 30); // Yatay siyah kutu (3 ışık için 30x30'luk kutular)
-
-        // Kırmızı ışık (solda)
-        gc.setFill(activeLight.equals("red") ? Color.RED : Color.GRAY);
-        gc.fillOval(x + 5, y + 5, 20, 20);
-
-        // Sarı ışık (ortada)
-        gc.setFill(activeLight.equals("yellow") ? Color.YELLOW : Color.GRAY);
-        gc.fillOval(x + 35, y + 5, 20, 20);
-
-        // Yeşil ışık (sağda)
-        gc.setFill(activeLight.equals("green") ? Color.GREEN : Color.GRAY);
-        gc.fillOval(x + 65, y + 5, 20, 20);
-    }
-
-    public static void drawFlower(GraphicsContext gc, double centerX, double centerY, Color petalColor, Color centerColor) {
-        double petalRadius = 10;
-        int petals = 3;
-
-        gc.setFill(petalColor);
-
-        // Yaprakları çiz
-        for (int i = 0; i < petals; i++) {
-            double angle = 2 * Math.PI / petals * i;
-            double x = centerX + Math.cos(angle) * petalRadius;
-            double y = centerY + Math.sin(angle) * petalRadius;
-            gc.fillOval(x - petalRadius, y - petalRadius, petalRadius * 2, petalRadius * 2);
-        }
-
-        // Orta kısmı çiz
-        gc.setFill(centerColor);
-        gc.fillOval(centerX - petalRadius / 2, centerY - petalRadius / 2, petalRadius, petalRadius);
-    }
-
-    private void drawVehicle(double x, double y, String type) {
-        if (type.equals("car")) {
-            gc.setFill(Color.HOTPINK);
-            gc.fillRect(x - 15, y - 7, 30, 14); // Car body
-            gc.setFill(Color.BLACK);
-            gc.fillOval(x - 10, y + 2, 5, 5); // Left wheel
-            gc.fillOval(x + 5, y + 2, 5, 5); // Right wheel
-        } else if (type.equals("truck")) {
-            gc.setFill(Color.MEDIUMPURPLE);
-            gc.fillRect(x - 20, y - 10, 40, 20); // Truck body
-            gc.setFill(Color.BLACK);
-            gc.fillOval(x - 15, y + 5, 6, 6); // Left front wheel
-            gc.fillOval(x - 5, y + 5, 6, 6); // Left rear wheel
-            gc.fillOval(x + 9, y + 5, 6, 6); // Right rear wheel
-        } else if (type.equals("ambulance")) {
-            gc.setFill(Color.WHITE);
-            gc.fillRect(x - 15, y - 7, 30, 14); // Ambulance body
-            gc.setFill(Color.RED);
-            gc.fillRect(x - 5, y - 3, 10, 6); // Red cross
-            gc.setFill(Color.BLACK);
-            gc.fillOval(x - 10, y + 2, 5, 5); // Left wheel
-            gc.fillOval(x + 5, y + 2, 5, 5); // Right wheel
-        }
-    }
-
     public TextField[] getDensityFields() {
         return densityFields;
     }
 
-    /* public void updateVehicleCounts(int[] counts) {
-         for (int i = 0; i < 4; i++) {
-             densityFields[i].setText(String.valueOf(counts[i]));
-         }
-     }*/
     public void updateVehicleCounts(int[] counts) {
         TextField[] fields = getDensityFields();
         fields[0].setText(String.valueOf(counts[0]));
@@ -408,5 +391,4 @@ public class TrafficView {
         fields[2].setText(String.valueOf(counts[2]));
         fields[3].setText(String.valueOf(counts[3]));
     }
-
 }

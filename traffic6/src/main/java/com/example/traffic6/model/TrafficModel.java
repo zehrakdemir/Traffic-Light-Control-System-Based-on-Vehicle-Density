@@ -109,14 +109,47 @@ public class TrafficModel {
         //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         if (currentPhase == 0) {
-            moveVehiclesWithPriority(3, deltaTime); // West
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
         } else if (currentPhase == 2) {
-            moveVehiclesWithPriority(0, deltaTime); // North
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
         } else if (currentPhase == 4) {
-            moveVehiclesWithPriority(2, deltaTime); // East
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
         } else if (currentPhase == 6) {
-            moveVehiclesWithPriority(1, deltaTime); // South
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
+        }else if (currentPhase == 1) {
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
+        }else if (currentPhase == 3) {
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
+        }else if (currentPhase == 5) {
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
+        }else if (currentPhase == 7) {
+            moveVehiclesWithPriority(0, deltaTime);
+            moveVehiclesWithPriority(1, deltaTime);
+            moveVehiclesWithPriority(2, deltaTime);
+            moveVehiclesWithPriority(3, deltaTime);
         }
+
         //0: north, 1: south, 2: east, 3: west
     }
     //0:     W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
@@ -176,8 +209,6 @@ public class TrafficModel {
                 continue; // Stop if yellow and not past intersection//BENCE BREAK YAPILABİLİR
             }
 
-
-
             // Önceki araçla çarpışmayı önle
             if (prevVehicle != null) {
                 double dx = prevVehicle.getActualX() - vehicle.getActualX();
@@ -190,9 +221,7 @@ public class TrafficModel {
                 }
             }
 
-
-            vehicle.move(deltaTime);
-            if (vehicle.hasPassedIntersection()) {
+            if ((vehicle.hasPassedIntersection())||((!vehicle.hasPassedIntersection())&&isGreen)) {
                 //toRemove.add(vehicle);
                 vehicle.move(deltaTime);
             }
@@ -221,20 +250,6 @@ public class TrafficModel {
         return remainingTime;
     }
 
-    /* public void startSimulation() {
-         isRunning = true;
-         currentPhase = 0;
-         remainingTime = greenDurations[currentPhase];
-     }
-
-     public void pauseSimulation() {
-         isRunning = false;
-     }*/
-     /*public void startSimulation() {
-        isRunning = true;
-        currentPhase = 0;
-        advancePhase(); // İlk fazı başlat
-    }*/
     public void resumeSimulation() {
         if (!isRunning && remainingTime > 0) {
             isRunning = true;

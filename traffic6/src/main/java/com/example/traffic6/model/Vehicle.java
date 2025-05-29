@@ -45,11 +45,7 @@ public class Vehicle {
     }
 
     public void move(double deltaTime) {
-        if (!hasPassedIntersection()) {
-            position += SPEED * deltaTime;
-        }else if(hasPassedIntersection()){
-            position += SPEED2 * deltaTime;
-        }
+        position += SPEED * deltaTime;
 
     }
 
