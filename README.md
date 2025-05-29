@@ -6,6 +6,12 @@ Trafik Işığı Simülasyonu, JavaFX tabanlı bir uygulamadır ve dört yönlü
 
 Proje, modülerlik ve sürdürülebilirlik sağlamak için Model-View-Controller (MVC) tasarım desenini kullanır. Gerçekçi bir simülasyon ortamı oluşturmak için yollar, yaya geçitleri, evler, ağaçlar, çiçekler, ördekler ve inekler gibi görsel unsurlar içerir.
 
+
+UML Diyagramı
+
+![TrafficLight_UML drawio 1](https://github.com/user-attachments/assets/20c6475e-1d73-4b01-b6d5-ad18691181eb)
+
+
 Özellikler
 Dinamik Trafik Işığı Sistemi: Her yöndeki (Kuzey, Güney, Doğu, Batı) araç yoğunluğuna göre yeşil ışık sürelerini ayarlar.
 Araç Türleri: Araba, kamyon ve ambulansları farklı görsel temsillerle destekler.
@@ -42,15 +48,7 @@ Run > Edit Configurations bölümünde VM seçeneklerini yapılandırın:
 
 Proje Yapısı: Projenizde aşağıdaki paket yapısının olduğundan emin olun:
 
-com.example.traffic6
-├── MainApp.java
-├── controller
-│   └── TrafficController.java
-├── model
-│   ├── TrafficModel.java
-│   └── Vehicle.java
-├── view
-│   └── TrafficView.java
+![image](https://github.com/user-attachments/assets/24eb1b27-6e56-4ccb-9ab9-1b7d551f383a)
 
 
 Derleyin ve Çalıştırın:
