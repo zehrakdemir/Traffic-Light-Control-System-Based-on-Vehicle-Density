@@ -36,10 +36,10 @@ public class TrafficModel {
 
     public void generateRandomCounts() {
         Random rand = new Random();
-        vehicleCounts[0] = rand.nextInt(41);
-        vehicleCounts[1] = rand.nextInt(41);
-        vehicleCounts[2] = rand.nextInt(41);
-        vehicleCounts[3] = rand.nextInt(41);
+        vehicleCounts[0] = rand.nextInt(101);
+        vehicleCounts[1] = rand.nextInt(101);
+        vehicleCounts[2] = rand.nextInt(101);
+        vehicleCounts[3] = rand.nextInt(101);
         calculateGreenDurations();
         generateVehicles();
     }
