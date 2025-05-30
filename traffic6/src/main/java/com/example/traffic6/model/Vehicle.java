@@ -4,12 +4,7 @@ public class Vehicle {
     private int direction; // direction 0: North, 1: South, 2: East, 3: West
     private double position; // aracın kavşağa uzaklığı(negatifse yaklaşıyor)
     private String type; // car, truck, ambulance
-    private String turn; // Aracın dönüş yönü (right, left ya da straight)
     private static final double SPEED = 50;
-
-    // Pixels per second
-    private double turnAngle = 0; // Dönüş sırasında aracın döndüğü açı.
-    private boolean isTurning = false; //Aracın şu anda dönüp dönmediğini belirten flag.
 
     public double getActualX() {
         switch (direction) {
@@ -50,10 +45,6 @@ public class Vehicle {
 
     public boolean hasPassedIntersection() {
         return position > -20; // Account for turning paths
-    }
-
-    public int getDirection() {
-        return direction;
     }
 
     public double getPosition() {

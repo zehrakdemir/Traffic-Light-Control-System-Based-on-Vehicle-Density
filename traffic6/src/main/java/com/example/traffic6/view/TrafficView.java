@@ -53,7 +53,7 @@ public class TrafficView {
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
 
-        // Input panel
+        // kullanıcı arayüzü (UI) oluşturmak için
         VBox inputPanel = new VBox(10);
         inputPanel.setPadding(new Insets(10));
         String[] directions = {"South", "North", "West", "East"};
@@ -62,6 +62,7 @@ public class TrafficView {
         timerLabels[1] = new Label("0.0s");
         timerLabels[2] = new Label("0.0s");
         timerLabels[3] = new Label("0.0s");
+
         for (int i = 0; i < 4; i++) {
             HBox row = new HBox(10);
             final TextField densityField = new TextField("0");
@@ -77,7 +78,7 @@ public class TrafficView {
             });
         }
 
-        // Kontrol düğmeleri
+        // Kontrol butonları
         HBox controls = new HBox(10);
         Button startButton = new Button("Start");
         Button pauseButton = new Button("Pause");
@@ -91,7 +92,7 @@ public class TrafficView {
         root.setTop(inputPanel);
         root.setCenter(canvas);
 
-        // Buton işlevleri
+        // Buton işlevleri event handler (olay yakalayıcı)
         startButton.setOnAction(e -> controller.startSimulation());
         pauseButton.setOnAction(e -> controller.pauseSimulation());
         resetButton.setOnAction(e -> controller.resetSimulation());
@@ -292,9 +293,10 @@ public class TrafficView {
         }
     }
 
+    //arayüzümüzü oluşturur
     public void render() {
         // Clear canvas
-        gc.setFill(Color.GREEN); // Grass background
+        gc.setFill(Color.GREEN);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // Yol çizimi
@@ -339,9 +341,9 @@ public class TrafficView {
         drawFlower(gc, 550, 580, Color.DARKSLATEBLUE, Color.WHITE);
 
         // Ördek çizimi
-        drawDuck(gc, 30, 210); // Sol üst yeşil alana yerleştirildi.
-        drawDuck(gc, 380, 180); // Sağ üst yeşil alana yerleştirildi
-        drawDuck(gc, 90, 480); // Sol alt yeşil alana yerleştirildi
+        drawDuck(gc, 30, 210);
+        drawDuck(gc, 380, 180);
+        drawDuck(gc, 90, 480);
         drawDuck(gc, 500, 480);
 
         // İnek çizimi
@@ -371,7 +373,7 @@ public class TrafficView {
             for (Vehicle vehicle : vehicles[i]) {
                 double pos = vehicle.getPosition();
                 double x = 0, y = 0;
-                gc.save();
+                gc.save();//Grafik ayarlarını kaydeder
                 if (i == 0) { // North
                     x = 325;
                     y = 340 - pos;
@@ -386,7 +388,7 @@ public class TrafficView {
                     y = 275;
                 }
                 drawVehicle(x, y, vehicle.getType());
-                gc.restore();
+                gc.restore(); //gc.save() ile kaydedilen önceki grafik ayarlarına geri dönülür.
             }
         }
 

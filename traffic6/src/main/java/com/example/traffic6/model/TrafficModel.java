@@ -57,7 +57,7 @@ public class TrafficModel {
         greenDurations[1] = Math.min(MAX_GREEN, Math.max(MIN_GREEN, (int) (TOTAL_CYCLE_TIME * percentages[1]))); // South
         greenDurations[2] = Math.min(MAX_GREEN, Math.max(MIN_GREEN, (int) (TOTAL_CYCLE_TIME * percentages[2]))); // East
         greenDurations[3] = Math.min(MAX_GREEN, Math.max(MIN_GREEN, (int) (TOTAL_CYCLE_TIME * percentages[3]))); // West
-        for (int i = 0; i < 4; i++) { // hiç araç yoksa 10 saniye yeşil yansın
+        for (int i = 0; i < 4; i++) { // hiç araç yoksa 0 saniye yeşil yansın
             if(vehicleCounts[i] == 0) {greenDurations[i] = 0;}
         }
 
@@ -70,7 +70,7 @@ public class TrafficModel {
             for (int j = 0; j < vehicleCounts[i]; j++) {
                 String type = rand.nextInt(3) == 0 ? "car" : rand.nextInt(2) == 0 ? "truck" : "ambulance";
                 String turn = "straight";
-                vehicles[i].add(new Vehicle(i, j * 90, type, turn)); // Increased spacing to 90 pixels
+                vehicles[i].add(new Vehicle(i, j * 90, type, turn)); //araç aralıkları
             }
         }
     }
@@ -91,7 +91,7 @@ public class TrafficModel {
 
     private void advancePhase() {
         currentPhase = (currentPhase + 1) % 8;
-
+// 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
         switch (currentPhase) {
             case 0: // W Green
                 remainingTime = greenDurations[3]; // West
@@ -127,6 +127,7 @@ public class TrafficModel {
 
         for (Vehicle vehicle : vehicles[direction]) {
             int phase = getCurrentPhase();
+            // 0: W Green, 1: WN Yellow, 2: N Green, 3: NE Yellow, 4: E Green, 5: ES Yellow, 6: S Green, 7: SW Yellow
             boolean isGreen = (direction == 3 && phase == 0) || (direction == 0 && phase == 2) || (direction == 2 && phase == 4) || (direction == 1 && phase == 6);
             boolean isYellow = (((direction == 0) || (direction == 3)) && phase == 1) ||
                     (((direction == 0) || (direction == 2)) && phase == 3) ||
@@ -179,7 +180,7 @@ public class TrafficModel {
         calculateGreenDurations();
         isRunning = true;
         isPaused = false;
-        currentPhase = 0;
+        currentPhase = 0;//west ten başlatıyor
         remainingTime = greenDurations[3]; // West green starts first
     }
 
